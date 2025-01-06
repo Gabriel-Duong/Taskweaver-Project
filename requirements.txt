@@ -1,0 +1,18 @@
+# Google API Client Libraries
+google-auth==2.25.2
+google-auth-oauthlib==1.1.0
+google-auth-httplib2==0.2.0
+google-api-python-client==2.123.0
+
+# OpenAI API Client Library
+openai==1.14.3
+
+# OAuth Handling
+oauthlib==3.2.2
+requests-oauthlib==1.3.1
+
+# Chainlit for GUI
+chainlit==1.0.0
+
+# General Utilities
+requests==2.31.0
