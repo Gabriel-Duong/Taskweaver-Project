@@ -1,4 +1,5 @@
 import openai
+import googleapiclient
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 
@@ -17,7 +18,7 @@ def generate_slide_content(prompt):
     Generate slide content using OpenAI Chat API.
     """
     response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",  # Use 'gpt-4' if you have access
+        model="gpt-4o", 
         messages=[
             {"role": "system", "content": "You are an AI assistant that generates presentation slide content."},
             {"role": "user", "content": prompt}
@@ -44,6 +45,8 @@ def add_slide(presentation_id, title, content):
     """
     Add a slide with dynamically retrieved object IDs for title and content.
     """
+    print("📑 Creating slide...")
+
     # Step 1: Create a new slide
     slide_creation_response = slides_service.presentations().batchUpdate(
         presentationId=presentation_id,
@@ -60,26 +63,34 @@ def add_slide(presentation_id, title, content):
         }
     ).execute()
 
-    # Step 2: Retrieve Object IDs
     slide_id = slide_creation_response['replies'][0]['createSlide']['objectId']
     print(f"✅ Slide created with ID: {slide_id}")
 
-    # Fetch object IDs for title and body placeholders
+    # Step 2: Retrieve page elements
     slide = slides_service.presentations().get(presentationId=presentation_id).execute()
     page_elements = next(
         (p['pageElements'] for p in slide['slides'] if p['objectId'] == slide_id),
         []
     )
 
+    print("🔍 Page Elements Retrieved:")
+    for element in page_elements:
+        print(element)
+
     title_id = None
     body_id = None
 
     for element in page_elements:
         if 'shape' in element:
-            shape_type = element['shape']['shapeType']
-            if shape_type == 'TITLE':
+            shape = element['shape']
+            placeholder = shape.get('placeholder', {})
+            placeholder_type = placeholder.get('type')
+
+            print(f"📝 Found Shape: {shape['shapeType']}, Placeholder Type: {placeholder_type}, Object ID: {element['objectId']}")
+
+            if placeholder_type == 'TITLE':
                 title_id = element['objectId']
-            elif shape_type == 'BODY':
+            elif placeholder_type == 'BODY':
                 body_id = element['objectId']
 
     if not title_id or not body_id:
@@ -107,4 +118,6 @@ def add_slide(presentation_id, title, content):
     ).execute()
 
     print(f"✅ Slide added successfully: Title - '{title}'")
+
+
 

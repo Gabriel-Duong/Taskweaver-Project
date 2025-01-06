@@ -9,7 +9,7 @@ try:
         model="gpt-3.5-turbo",  # Replace with "gpt-4" if you have access
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "Say hello in a creative way."}
+            {"role": "user", "content": "What is the capital of France?"}
         ],
         max_tokens=20
     )
